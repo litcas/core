@@ -134,3 +134,39 @@ Feature: files and folders can be deleted from the trashbin
     But as "Alice" the file with original path "/PARENT/parent.txt" should exist in the trashbin
     But as "Alice" the file with original path "/FOLDER/parent.txt" should exist in the trashbin
     And as "Alice" the file with original path "/FOLDER/CHILD/child.txt" should exist in the trashbin
+
+  @smokeTest
+  Scenario Outline: delete a file with special characters from the trashbin
+    Given user "Alice" has uploaded file with content "to delete" to "<path>"
+    And user "Alice" has deleted file "<path>"
+    When user "Alice" deletes the file with original path "<path>" from the trashbin using the trashbin API
+    Then the HTTP status code should be "204"
+    And as "Alice" the file with original path "<path>" should not exist in the trashbin
+    Examples:
+      | dav-path | path             |
+      | old      | qa&dev.txt       |
+      | old      | !@tester$^.txt   |
+      | old      | %file *?2.txt    |
+      | old      | # %ab ab?=ed.txt |
+      | new      | qa&dev.txt       |
+      | new      | !@tester$^.txt   |
+      | new      | %file *?2.txt    |
+      | new      | # %ab ab?=ed.txt |
+
+  @smokeTest
+  Scenario Outline: delete a folder with special characters from the trashbin
+    Given user "Alice" has created folder "<path>"
+    And user "Alice" has deleted folder "<path>"
+    When user "Alice" deletes the folder with original path "<path>" from the trashbin using the trashbin API
+    Then the HTTP status code should be "204"
+    And as "Alice" the folder with original path "<path>" should not exist in the trashbin
+    Examples:
+      | dav-path | path         |
+      | old      | qa&dev       |
+      | old      | !@tester$^   |
+      | old      | %file *?2    |
+      | old      | # %ab ab?=ed |
+      | new      | qa&dev       |
+      | new      | !@tester$^   |
+      | new      | %file *?2    |
+      | new      | # %ab ab?=ed |

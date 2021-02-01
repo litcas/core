@@ -337,3 +337,43 @@ Feature: Restore deleted files/folders
       | dav-path |
       | old      |
       | new      |
+
+  @smokeTest
+  Scenario Outline: restoring file with special characters
+    Given using <dav-path> DAV path
+    And user "Alice" has uploaded file with content "to delete" to "<path>"
+    And user "Alice" has deleted file "<path>"
+    When user "Alice" restores the file with original path "<path>" using the trashbin API
+    Then the HTTP status code should be "201"
+    And as "Alice" the file with original path "<path>" should not exist in the trashbin
+    And as "Alice" file "<path>" should exist
+    Examples:
+      | dav-path | path             |
+      | old      | qa&dev.txt       |
+      | old      | !@tester$^.txt   |
+      | old      | %file *?2.txt    |
+      | old      | # %ab ab?=ed.txt |
+      | new      | qa&dev.txt       |
+      | new      | !@tester$^.txt   |
+      | new      | %file *?2.txt    |
+      | new      | # %ab ab?=ed.txt |
+
+  @smokeTest
+  Scenario Outline: restoring folder with special characters
+    Given using <dav-path> DAV path
+    And user "Alice" has created folder "<path>"
+    And user "Alice" has deleted folder "<path>"
+    When user "Alice" restores the folder with original path "<path>" using the trashbin API
+    Then the HTTP status code should be "201"
+    And as "Alice" the folder with original path "<path>" should not exist in the trashbin
+    And as "Alice" folder "<path>" should exist
+    Examples:
+      | dav-path | path         |
+      | old      | qa&dev       |
+      | old      | !@tester$^   |
+      | old      | %file *?2    |
+      | old      | # %ab ab?=ed |
+      | new      | qa&dev       |
+      | new      | !@tester$^   |
+      | new      | %file *?2    |
+      | new      | # %ab ab?=ed |

@@ -283,3 +283,39 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | old      |
       | new      |
+
+  @issue-ocis-1547
+  Scenario Outline: deleting a file with special characters moves it to trashbin
+    Given using <dav-path> DAV path
+    And user "Alice" has uploaded file with content "unusal file" to "<path>"
+    When user "Alice" deletes file "<path>" using the WebDAV API
+    Then as "Alice" file "<path>" should not exist
+    But as "Alice" file "<path>" should exist in the trashbin
+    Examples:
+      | dav-path | path             |
+      | old      | qa&dev.txt       |
+      | old      | !@tester$^.txt   |
+      | old      | %file *?2.txt    |
+      | old      | # %ab ab?=ed.txt |
+      | new      | qa&dev.txt       |
+      | new      | !@tester$^.txt   |
+      | new      | %file *?2.txt    |
+      | new      | # %ab ab?=ed.txt |
+
+  @issue-ocis-1547
+  Scenario Outline: deleting a folder with special characters moves it to trashbin
+    Given using <dav-path> DAV path
+    And user "Alice" has created folder "<path>"
+    When user "Alice" deletes folder "<path>" using the WebDAV API
+    Then as "Alice" folder "<path>" should not exist
+    But as "Alice" folder "<path>" should exist in the trashbin
+    Examples:
+      | dav-path | path         |
+      | old      | qa&dev       |
+      | old      | !@tester$^   |
+      | old      | %file *?2    |
+      | old      | # %ab ab?=ed |
+      | new      | qa&dev       |
+      | new      | !@tester$^   |
+      | new      | %file *?2    |
+      | new      | # %ab ab?=ed |
